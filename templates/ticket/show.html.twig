@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ticket{% endblock %}
+
+{% block body %}
+    <h1>Ticket</h1>
+    {% if ticket.status == 'Pris en charge' %}
+        <form action="{{ path('supported', {'id': ticket.id}) }}" method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token('supported' ~ ticket.id) }}">
+            <button class="">Demande résolu</button>
+        </form>
+    {% else %}
+        <form action="{{ path('supported', {'id': ticket.id}) }}" method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token('supported' ~ ticket.id) }}">
+            <button class="">Pris en charge</button>
+        </form>
+    {% endif %}
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Référence</th>
+                <td>{{ ticket.id }}</td>
+            </tr>
+            <tr>
+                <th>Titre</th>
+                <td>{{ ticket.title }}</td>
+            </tr>
+            <tr>
+                <th>Status de la demande</th>
+                <td>{{ ticket.status }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ ticket.description }}</td>
+            </tr>
+            <tr>
+                <th>Contexte</th>
+                <td>{{ ticket.context }}</td>
+            </tr>
+            <tr>
+                <th>Date de création de la demande</th>
+                <td>{{ ticket.createdAt ? ticket.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <h2>Activités</h2>
+    <div style="display:flex;flex-direction:column;margin:2em;">
+            {% for  activity in activities %}
+                <p>
+                {% if activity.comment == 'a ouvert un ticket' %}
+                    {{ activity.ticket.user }}
+                {% else  %}
+                    {{ activity.ticket.support }}
+                {% endif %}
+
+                     {{ activity.comment }} Le {{ activity.createdAt ? activity.createdAt|date('Y-m-d H:i:s') : '' }}</span></p>
+            {% endfor %}
+    </div>
+    <div style="margin:2em;">
+        {{ form_start(form) }}
+            <div style="display:flex;flex-direction:column;margin:2em;">
+                {{form_label(form.comment)}}
+                {{form_widget(form.comment)}}
+                <button class="btn">{{ button_label|default('Envoyer') }}</button>
+            </div>
+        {{ form_end(form) }}
+    </div>
+
+    <a href="{{ path('app_ticket_index') }}">Retour à la liste</a>
+    {#<a href="{{ path('app_ticket_edit', {'id': ticket.id}) }}">edit</a>#}
+    {{ include('ticket/_delete_form.html.twig') }}
+{% endblock %}
